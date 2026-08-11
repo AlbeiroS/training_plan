@@ -48,7 +48,7 @@ body{font-family:var(--f-body);background:var(--paper);color:var(--ink);line-hei
 .sec-head{font-family:var(--f-head);text-transform:uppercase;letter-spacing:.14em;font-size:.9rem;color:var(--muted);font-weight:700;display:flex;align-items:center;gap:12px;margin:26px 0 12px}
 .sec-head::after{content:"";flex:1;height:1px;background:var(--line)}
 
-/* ============ CHARTS (fixed-height track = percentage heights resolve) ============ */
+/* CHARTS */
 .chart-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 12px 12px;margin-bottom:10px}
 .bars{display:flex;align-items:flex-end;gap:4px}
 .bar-col{flex:1;min-width:0;text-align:center;cursor:pointer}
@@ -56,7 +56,6 @@ body{font-family:var(--f-body);background:var(--paper);color:var(--ink);line-hei
 .bar-track{height:var(--track);display:flex;align-items:flex-end;gap:2px}
 .bar{width:100%;min-height:3px;border-radius:4px 4px 0 0;background:var(--base);transition:height .3s}
 .bar-lab{font-size:.6rem;color:var(--muted);font-weight:700;margin-top:5px}
-
 .p-plan{flex:1;min-height:3px;border-radius:3px 3px 0 0;
   background:repeating-linear-gradient(45deg,#DCD7CB,#DCD7CB 3px,#EAE6DC 3px,#EAE6DC 6px)}
 .p-act{flex:1;min-height:0;border-radius:3px 3px 0 0;background:var(--taper);transition:height .3s}
@@ -86,13 +85,8 @@ body{font-family:var(--f-body);background:var(--paper);color:var(--ink);line-hei
 .week.open .week-body{display:block}
 .wnote{font-size:.82rem;color:var(--ink-2);background:var(--paper);padding:10px 12px;border-radius:9px;margin:13px 0}
 
-.session{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.session{padding:12px 0;border-bottom:1px solid var(--line)}
 .session:last-child{border-bottom:0}
-.chk{width:26px;height:26px;border-radius:7px;border:2px solid var(--line);flex-shrink:0;margin-top:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;background:#fff}
-.chk.done{background:var(--taper);border-color:var(--taper)}
-.chk svg{width:14px;color:#fff;opacity:0}
-.chk.done svg{opacity:1}
-.s-body{flex:1;min-width:0}
 .s-top{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
 .s-order{font-family:var(--f-head);font-size:1.05rem;font-weight:700;text-transform:uppercase;color:var(--muted)}
 .tag{font-size:.58rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:999px;color:#fff}
@@ -103,12 +97,23 @@ body{font-family:var(--f-body);background:var(--paper);color:var(--ink);line-hei
 .s-dist{margin-left:auto;font-family:var(--f-head);font-weight:800;font-size:1.15rem}
 .s-detail{font-size:.83rem;color:var(--ink-2);margin-top:3px}
 .s-feel{font-size:.74rem;color:var(--muted);margin-top:4px;font-style:italic}
-.s-log{display:flex;align-items:center;gap:8px;margin-top:9px}
-.s-log label{font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700}
-.s-log input{width:74px;padding:5px 9px;border:2px solid var(--line);border-radius:8px;font-family:var(--f-body);font-size:.88rem;font-weight:700;text-align:right;background:var(--paper);color:var(--ink)}
-.s-log input:focus{outline:none;border-color:var(--taper);background:#fff}
-.s-log .u{font-size:.7rem;color:var(--muted);font-weight:700}
-.s-log .delta{font-size:.7rem;font-weight:700;margin-left:auto}
+
+/* LOG ROW */
+.s-log{display:flex;align-items:center;gap:8px;margin-top:10px;background:var(--paper);
+       padding:9px 10px;border-radius:10px;flex-wrap:wrap}
+.s-log label{font-size:.66rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.s-log input{width:72px;padding:7px 9px;border:2px solid var(--line);border-radius:8px;
+  font-family:var(--f-body);font-size:1rem;font-weight:700;text-align:right;background:#fff;color:var(--ink)}
+.s-log input:focus{outline:none;border-color:var(--taper)}
+.s-log .u{font-size:.72rem;color:var(--muted);font-weight:700}
+.btn-save{
+  font-family:var(--f-body);font-size:.78rem;font-weight:800;letter-spacing:.04em;
+  padding:8px 16px;border-radius:8px;border:2px solid var(--ink);background:var(--ink);
+  color:#fff;cursor:pointer;transition:.15s;min-width:74px;
+}
+.btn-save:active{transform:scale(.96)}
+.btn-save.ok{background:var(--taper);border-color:var(--taper)}
+.delta{font-size:.72rem;font-weight:700;margin-left:auto}
 .delta.up{color:var(--build)}
 .delta.dn{color:var(--muted)}
 .delta.ok{color:var(--taper)}
@@ -130,10 +135,16 @@ body{font-family:var(--f-body);background:var(--paper);color:var(--ink);line-hei
 .btn-reset:hover{border-color:var(--race);color:var(--race)}
 .foot{text-align:center;font-size:.72rem;color:var(--muted);padding:26px 0 10px;line-height:1.7}
 
+.flash{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--taper);
+  color:#fff;font-size:.8rem;font-weight:700;padding:10px 22px;border-radius:999px;
+  opacity:0;pointer-events:none;transition:opacity .25s;z-index:99;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+.flash.on{opacity:1}
+
 @media(max-width:420px){
   :root{--track:92px}
   .stats{grid-template-columns:repeat(2,1fr)}
   .bar-val{display:none}
+  .delta{margin-left:0;width:100%}
 }
 </style>
 </head>
@@ -219,6 +230,8 @@ body{font-family:var(--f-body);background:var(--paper);color:var(--ink);line-hei
     Week 1 starts Monday, August 10, 2026.
   </div>
 </div>
+
+<div class="flash" id="flash">Saved</div>
 
 <script>
 /* ================= PLAN DATA (miles) ================= */
@@ -309,7 +322,7 @@ const TYPE_LABEL  = {easy:'Slow', interval:'Interval', long:'Long run', race:'Ra
 const ORDINAL     = ['Run 1','Run 2','Run 3'];
 
 let unit='mi';
-let logged={};   // key "week-index" -> MILES (always stored in miles)
+let logged={};   // key "week-index" -> MILES
 
 /* ---------- storage ---------- */
 const KEY='hm2026';
@@ -324,7 +337,7 @@ function storageWorks(){
   try{ localStorage.setItem('__t','1'); localStorage.removeItem('__t'); return true; }catch(e){ return false; }
 }
 function resetAll(){
-  if(!confirm('Clear all logged miles?')) return;
+  if(!confirm('Clear all logged runs?')) return;
   logged={};
   try{ localStorage.removeItem(KEY); }catch(e){}
   render();
@@ -340,6 +353,15 @@ function weekActual(w){ return w.s.reduce((a,x,i)=>a+(logged[w.n+'-'+i]||0),0); 
 function totalLogged(){ return PLAN.reduce((a,w)=>a+weekActual(w),0); }
 function runsLogged(){ return Object.values(logged).filter(v=>v>0).length; }
 
+let flashT;
+function flash(msg){
+  const f=document.getElementById('flash');
+  f.textContent=msg||'Saved';
+  f.classList.add('on');
+  clearTimeout(flashT);
+  flashT=setTimeout(()=>f.classList.remove('on'),1400);
+}
+
 function setUnit(u){
   unit=u;
   document.getElementById('btnMi').classList.toggle('on',u==='mi');
@@ -349,14 +371,28 @@ function setUnit(u){
 
 function toggleWeek(n){ document.getElementById('w'+n).classList.toggle('open'); }
 
-function setLog(wn,si,val){
+/* ---------- THE SAVE ACTION ---------- */
+function saveRun(wn,si){
   const k=wn+'-'+si;
-  if(val===''||val===null){ delete logged[k]; }
-  else{ logged[k] = Math.max(0, toMiles(parseFloat(val)||0)); }
+  const input=document.getElementById('i'+k);
+  const val=parseFloat(input.value);
+  const miles=isNaN(val)||val<=0 ? 0 : toMiles(val);
+
+  if(miles>0) logged[k]=miles; else delete logged[k];
   save();
+
+  // button feedback
+  const btn=document.getElementById('b'+k);
+  const original=btn.textContent;
+  btn.textContent='Saved ✓';
+  btn.classList.add('ok');
+  setTimeout(()=>{ btn.textContent=original; btn.classList.remove('ok'); },1600);
+  flash(miles>0 ? 'Saved '+fmt(miles) : 'Cleared');
+
+  // targeted refresh (keeps focus and open state)
   renderCharts(); renderStats(); renderProgressText(); refreshWeekTotals();
-  const row=document.getElementById('d'+k);
-  if(row) row.outerHTML = deltaHtml(wn,si);
+  const d=document.getElementById('d'+k);
+  if(d) d.outerHTML=deltaHtml(wn,si);
 }
 
 function deltaHtml(wn,si){
@@ -365,8 +401,8 @@ function deltaHtml(wn,si){
   if(v>0){
     const diff=v-w.s[si].mi;
     if(Math.abs(diff)<0.15){ cls='ok'; txt='on plan'; }
-    else if(diff>0){ cls='up'; txt='+'+num(diff)+' '+unit; }
-    else{ cls='dn'; txt=num(diff)+' '+unit; }
+    else if(diff>0){ cls='up'; txt='+'+num(diff)+' '+unit+' over'; }
+    else{ cls='dn'; txt=num(Math.abs(diff))+' '+unit+' under'; }
   }
   return `<span class="delta ${cls}" id="d${k}">${txt}</span>`;
 }
@@ -395,7 +431,6 @@ function renderCharts(){
   const plans=PLAN.map(weekPlan);
   const acts =PLAN.map(weekActual);
 
-  // Chart 1 — planned only
   const max1=Math.max(...plans);
   document.getElementById('bars').innerHTML=PLAN.map((w,i)=>`
     <div class="bar-col" onclick="toggleWeek(${w.n});document.getElementById('w${w.n}').scrollIntoView({behavior:'smooth',block:'center'})">
@@ -406,7 +441,6 @@ function renderCharts(){
       <div class="bar-lab">${w.n}</div>
     </div>`).join('');
 
-  // Chart 2 — planned vs actual
   const max2=Math.max(...plans,...acts,1);
   document.getElementById('pbars').innerHTML=PLAN.map((w,i)=>`
     <div class="bar-col">
@@ -432,24 +466,22 @@ function renderWeeks(){
     const a=weekActual(w);
     const sessions=w.s.map((s,i)=>{
       const k=w.n+'-'+i;
-      const v=logged[k]!==undefined ? num(logged[k]) : '';
+      const v=logged[k]!==undefined ? num(logged[k]) : '0';
       return `<div class="session">
-        <div class="s-body">
-          <div class="s-top">
-            <span class="s-order">${ORDINAL[i]}</span>
-            <span class="tag ${s.type}">${TYPE_LABEL[s.type]}</span>
-            <span class="s-dist">${fmt(s.mi)}</span>
-          </div>
-          <div class="s-detail">${s.det}</div>
-          <div class="s-feel">${s.feel}</div>
-          <div class="s-log">
-            <label for="i${k}">I ran</label>
-            <input id="i${k}" type="number" inputmode="decimal" step="0.1" min="0"
-                   placeholder="${num(s.mi)}" value="${v}"
-                   onchange="setLog(${w.n},${i},this.value)">
-            <span class="u">${unit}</span>
-            ${deltaHtml(w.n,i)}
-          </div>
+        <div class="s-top">
+          <span class="s-order">${ORDINAL[i]}</span>
+          <span class="tag ${s.type}">${TYPE_LABEL[s.type]}</span>
+          <span class="s-dist">${fmt(s.mi)}</span>
+        </div>
+        <div class="s-detail">${s.det}</div>
+        <div class="s-feel">${s.feel}</div>
+        <div class="s-log">
+          <label for="i${k}">I ran</label>
+          <input id="i${k}" type="number" inputmode="decimal" step="0.1" min="0" value="${v}"
+                 onfocus="this.select()">
+          <span class="u">${unit}</span>
+          <button class="btn-save" id="b${k}" onclick="saveRun(${w.n},${i})">Save</button>
+          ${deltaHtml(w.n,i)}
         </div>
       </div>`;
     }).join('');
@@ -488,7 +520,7 @@ document.getElementById('btnMi').classList.toggle('on',unit==='mi');
 document.getElementById('btnKm').classList.toggle('on',unit==='km');
 document.getElementById('saveNote').textContent = storageWorks()
   ? 'Your logged runs are saved on this device automatically.'
-  : 'Saving is off in this preview — it works once the file is opened in a browser.';
+  : 'Saving is off in this preview — it works on the live site.';
 renderCountdown();
 render();
 setInterval(renderCountdown,60000);
