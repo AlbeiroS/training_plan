@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Half Marathon · 11-Week Plan · Oct 25, 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#12141C; --ink-2:#2A2E3D;
+  --paper:#F6F4EF; --card:#FFFFFF;
+  --line:#E2DED4; --muted:#7A7669;
+  --base:#2F6F8F; --build:#C4553C; --peak:#8A5B2E; --taper:#4B7A52; --race:#B4283C;
+  --easy:#2F6F8F; --interval:#C4553C; --long:#8A5B2E;
+  --f-head:'Barlow Condensed',sans-serif;
+  --f-body:'Karla',sans-serif;
+  --track:112px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:var(--f-body);background:var(--paper);color:var(--ink);line-height:1.55;padding-bottom:60px}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px}
+
+/* HERO */
+.hero{background:var(--ink);color:var(--paper);padding:28px 0 24px;border-bottom:4px solid var(--race);position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;border:22px solid rgba(255,255,255,.05);border-radius:50%}
+.kicker{font-family:var(--f-head);font-size:.85rem;letter-spacing:.22em;text-transform:uppercase;color:#9AA3B2;margin-bottom:6px}
+.hero h1{font-family:var(--f-head);font-weight:800;font-size:clamp(2.1rem,8vw,3.2rem);line-height:.95;text-transform:uppercase;letter-spacing:-.01em}
+.hero h1 em{font-style:normal;color:var(--race)}
+.hero p.sub{color:#B9BECB;font-size:.95rem;margin-top:10px;max-width:48ch}
+.countdown{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;position:relative;z-index:1}
+.cd-box{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px 14px;min-width:74px;text-align:center}
+.cd-num{font-family:var(--f-head);font-size:1.7rem;font-weight:800;line-height:1}
+.cd-lab{font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:#9AA3B2;margin-top:3px}
+
+/* CONTROLS */
+.controls{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 0;flex-wrap:wrap}
+.unit-toggle{display:inline-flex;border:2px solid var(--ink);border-radius:999px;overflow:hidden}
+.unit-toggle button{font-family:var(--f-head);font-size:1rem;font-weight:700;letter-spacing:.1em;padding:7px 20px;border:0;background:transparent;color:var(--ink);cursor:pointer;text-transform:uppercase}
+.unit-toggle button.on{background:var(--ink);color:var(--paper)}
+.progress-mini{font-size:.8rem;color:var(--muted);font-weight:600}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:22px}
+.stat{background:var(--card);padding:14px 8px;text-align:center}
+.stat b{display:block;font-family:var(--f-head);font-size:1.6rem;font-weight:800;line-height:1}
+.stat span{font-size:.6rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);display:block;margin-top:4px}
+
+.sec-head{font-family:var(--f-head);text-transform:uppercase;letter-spacing:.14em;font-size:.9rem;color:var(--muted);font-weight:700;display:flex;align-items:center;gap:12px;margin:26px 0 12px}
+.sec-head::after{content:"";flex:1;height:1px;background:var(--line)}
+
+/* ============ CHARTS (fixed-height track = percentage heights resolve) ============ */
+.chart-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 12px 12px;margin-bottom:10px}
+.bars{display:flex;align-items:flex-end;gap:4px}
+.bar-col{flex:1;min-width:0;text-align:center;cursor:pointer}
+.bar-val{font-size:.58rem;color:var(--ink);font-weight:700;margin-bottom:3px;height:14px}
+.bar-track{height:var(--track);display:flex;align-items:flex-end;gap:2px}
+.bar{width:100%;min-height:3px;border-radius:4px 4px 0 0;background:var(--base);transition:height .3s}
+.bar-lab{font-size:.6rem;color:var(--muted);font-weight:700;margin-top:5px}
+
+.p-plan{flex:1;min-height:3px;border-radius:3px 3px 0 0;
+  background:repeating-linear-gradient(45deg,#DCD7CB,#DCD7CB 3px,#EAE6DC 3px,#EAE6DC 6px)}
+.p-act{flex:1;min-height:0;border-radius:3px 3px 0 0;background:var(--taper);transition:height .3s}
+.p-act.over{background:var(--build)}
+.legend{display:flex;gap:16px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+.legend span{font-size:.7rem;color:var(--muted);font-weight:600;display:flex;align-items:center;gap:6px}
+.swatch{width:12px;height:12px;border-radius:3px;display:inline-block}
+
+/* WEEK CARDS */
+.week{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:10px;overflow:hidden;border-left:5px solid var(--base)}
+.week.build{border-left-color:var(--build)}
+.week.peak{border-left-color:var(--peak)}
+.week.taper{border-left-color:var(--taper)}
+.week.race{border-left-color:var(--race);background:#FFF8F8}
+.week-head{display:flex;align-items:center;gap:12px;padding:14px 15px;cursor:pointer}
+.wnum{font-family:var(--f-head);font-size:1.9rem;font-weight:800;line-height:.85;min-width:34px}
+.wmeta{flex:1;min-width:0}
+.wtitle{font-family:var(--f-head);font-size:1.15rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+.wdates{font-size:.74rem;color:var(--muted);font-weight:600}
+.wtotal{text-align:right}
+.wtotal b{font-family:var(--f-head);font-size:1.4rem;font-weight:800;display:block;line-height:1}
+.wtotal span{font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.wtotal .ran{font-size:.66rem;font-weight:700;color:var(--taper);letter-spacing:0;text-transform:none}
+.chev{width:18px;color:var(--muted);transition:transform .25s;flex-shrink:0}
+.week.open .chev{transform:rotate(180deg)}
+.week-body{display:none;padding:0 15px 15px;border-top:1px dashed var(--line)}
+.week.open .week-body{display:block}
+.wnote{font-size:.82rem;color:var(--ink-2);background:var(--paper);padding:10px 12px;border-radius:9px;margin:13px 0}
+
+.session{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.session:last-child{border-bottom:0}
+.chk{width:26px;height:26px;border-radius:7px;border:2px solid var(--line);flex-shrink:0;margin-top:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;background:#fff}
+.chk.done{background:var(--taper);border-color:var(--taper)}
+.chk svg{width:14px;color:#fff;opacity:0}
+.chk.done svg{opacity:1}
+.s-body{flex:1;min-width:0}
+.s-top{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.s-order{font-family:var(--f-head);font-size:1.05rem;font-weight:700;text-transform:uppercase;color:var(--muted)}
+.tag{font-size:.58rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:999px;color:#fff}
+.tag.easy{background:var(--easy)}
+.tag.interval{background:var(--interval)}
+.tag.long{background:var(--long)}
+.tag.race{background:var(--race)}
+.s-dist{margin-left:auto;font-family:var(--f-head);font-weight:800;font-size:1.15rem}
+.s-detail{font-size:.83rem;color:var(--ink-2);margin-top:3px}
+.s-feel{font-size:.74rem;color:var(--muted);margin-top:4px;font-style:italic}
+.s-log{display:flex;align-items:center;gap:8px;margin-top:9px}
+.s-log label{font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.s-log input{width:74px;padding:5px 9px;border:2px solid var(--line);border-radius:8px;font-family:var(--f-body);font-size:.88rem;font-weight:700;text-align:right;background:var(--paper);color:var(--ink)}
+.s-log input:focus{outline:none;border-color:var(--taper);background:#fff}
+.s-log .u{font-size:.7rem;color:var(--muted);font-weight:700}
+.s-log .delta{font-size:.7rem;font-weight:700;margin-left:auto}
+.delta.up{color:var(--build)}
+.delta.dn{color:var(--muted)}
+.delta.ok{color:var(--taper)}
+
+.zone{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 15px;margin-bottom:9px;border-top:3px solid var(--easy)}
+.zone.z-int{border-top-color:var(--interval)}
+.zone.z-long{border-top-color:var(--long)}
+.zone h4{font-family:var(--f-head);font-size:1.2rem;text-transform:uppercase;letter-spacing:.04em}
+.zone p{font-size:.85rem;color:var(--ink-2);margin-top:5px}
+.zone .test{font-size:.76rem;color:var(--muted);margin-top:7px;padding-top:7px;border-top:1px dashed var(--line)}
+
+.rules{background:var(--ink);color:var(--paper);border-radius:14px;padding:18px 18px 8px;margin-bottom:10px}
+.rules h4{font-family:var(--f-head);font-size:1.3rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+.rules li{font-size:.86rem;color:#D6D9E0;margin-bottom:10px;list-style:none;padding-left:20px;position:relative}
+.rules li::before{content:"→";position:absolute;left:0;color:var(--race);font-weight:700}
+
+.savenote{font-size:.72rem;color:var(--muted);text-align:center;padding:10px 0 0}
+.btn-reset{display:block;margin:10px auto 0;background:none;border:1.5px solid var(--line);color:var(--muted);font-family:var(--f-body);font-weight:700;font-size:.76rem;padding:7px 16px;border-radius:999px;cursor:pointer}
+.btn-reset:hover{border-color:var(--race);color:var(--race)}
+.foot{text-align:center;font-size:.72rem;color:var(--muted);padding:26px 0 10px;line-height:1.7}
+
+@media(max-width:420px){
+  :root{--track:92px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .bar-val{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="wrap">
+    <div class="kicker">Training plan · 11 weeks</div>
+    <h1>Half<br>Marathon<em>.</em></h1>
+    <p class="sub">Three runs a week: one slow day, one interval session, one long run. Progressive build from August 10 to race day.</p>
+    <div class="countdown" id="cd"></div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="controls">
+    <div class="unit-toggle">
+      <button id="btnMi" class="on" onclick="setUnit('mi')">MI</button>
+      <button id="btnKm" onclick="setUnit('km')">KM</button>
+    </div>
+    <div class="progress-mini" id="progTxt">0 of 33 runs logged</div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><b id="stTotal">—</b><span>Planned total</span></div>
+    <div class="stat"><b id="stPeak">—</b><span>Peak week</span></div>
+    <div class="stat"><b id="stLong">—</b><span>Longest run</span></div>
+    <div class="stat"><b id="stLogged">—</b><span>You've logged</span></div>
+  </div>
+
+  <div class="sec-head">Planned miles per week</div>
+  <div class="chart-card"><div class="bars" id="bars"></div></div>
+
+  <div class="sec-head">Your progress · planned vs actual</div>
+  <div class="chart-card">
+    <div class="bars" id="pbars"></div>
+    <div class="legend">
+      <span><i class="swatch" style="background:repeating-linear-gradient(45deg,#DCD7CB,#DCD7CB 3px,#EAE6DC 3px,#EAE6DC 6px)"></i> Planned</span>
+      <span><i class="swatch" style="background:var(--taper)"></i> Actual</span>
+      <span><i class="swatch" style="background:var(--build)"></i> Over plan</span>
+    </div>
+  </div>
+  <div class="savenote" id="saveNote"></div>
+  <button class="btn-reset" onclick="resetAll()">Reset all data</button>
+
+  <div class="sec-head">The 11 weeks</div>
+  <div id="weeks"></div>
+
+  <div class="sec-head">How to run each session</div>
+
+  <div class="zone">
+    <h4>Slow day · Easy</h4>
+    <p>Comfortable, conversational, unhurried. This is the aerobic base — you build the engine here without burning matches. Run it slower than feels natural.</p>
+    <div class="test">Test: you should be able to speak full sentences without gasping.</div>
+  </div>
+
+  <div class="zone z-int">
+    <h4>Interval day</h4>
+    <p>Always: 1 mile warm-up, then the reps with a 200 m easy jog between each, then 1 mile cool-down. Reps are run hard but controlled — every rep should be roughly the same time. If the last one is much slower than the first, you started too fast.</p>
+    <div class="test">Test: you can say 2 or 3 words at the end of a rep, and you recover enough in the 200 m jog to hit the next one.</div>
+  </div>
+
+  <div class="zone z-long">
+    <h4>Long run</h4>
+    <p>Slower than your slow day. The goal is time on feet, not pace. This is where you train your head as much as your legs.</p>
+    <div class="test">Practice: from week 5 on, rehearse hydration and a gel or snack every 45 minutes.</div>
+  </div>
+
+  <div class="rules">
+    <h4>5 rules for this plan</h4>
+    <ul>
+      <li>Leave at least one full day between sessions. Any three days that work for you are fine — just keep the order: slow, intervals, long.</li>
+      <li>About 80% of your volume should feel easy. Only the interval reps are meant to be hard.</li>
+      <li>Weeks 4, 7 and 10 drop on purpose. Don't skip ahead or add miles — adaptation happens in the down weeks.</li>
+      <li>If a niggle changes how you run, stop. Losing three days now beats losing race day.</li>
+      <li>Nothing new on race day: no new shoes, clothes, food or gel you haven't tested on a long run.</li>
+    </ul>
+  </div>
+
+  <div class="foot">
+    Built for the half marathon on Sunday, October 25, 2026.<br>
+    Week 1 starts Monday, August 10, 2026.
+  </div>
+</div>
+
+<script>
+/* ================= PLAN DATA (miles) ================= */
+const RACE = new Date(2026,9,25,7,0,0);
+
+const PLAN = [
+ {n:1, phase:'base', title:'Getting rolling', dates:'Aug 10 – 16',
+  note:'Start conservative. The goal this week is not pace — it is showing up all three days.',
+  s:[
+    {type:'easy', mi:3, det:'Continuous easy run', feel:'If in doubt, go slower.'},
+    {type:'interval', mi:3.5, det:'1 mi warm-up + 4 × 400 m (200 m jog recovery) + 1 mi cool-down', feel:'First taste of speed. Keep all four reps even.'},
+    {type:'long', mi:4, det:'Easy long run, walk breaks allowed', feel:'Finish feeling you could have kept going.'}
+  ]},
+ {n:2, phase:'base', title:'Building', dates:'Aug 17 – 23',
+  note:'One more rep on the track, one more mile on the long run.',
+  s:[
+    {type:'easy', mi:3, det:'Continuous easy run', feel:'Recovery pace.'},
+    {type:'interval', mi:3.9, det:'1 mi warm-up + 5 × 400 m (200 m jog recovery) + 1 mi cool-down', feel:'Same effort as last week, one extra rep.'},
+    {type:'long', mi:5, det:'Steady easy long run', feel:'Slower than your easy day.'}
+  ]},
+ {n:3, phase:'base', title:'First jump', dates:'Aug 24 – 30',
+  note:'Long run reaches 6 miles. It is normal for this week to feel heavier than the last.',
+  s:[
+    {type:'easy', mi:3, det:'Continuous easy run', feel:'Legs may be tired — that is fine.'},
+    {type:'interval', mi:4.3, det:'1 mi warm-up + 6 × 400 m (200 m jog recovery) + 1 mi cool-down', feel:'Six reps. Hold the pace on reps 5 and 6.'},
+    {type:'long', mi:6, det:'Easy long run, hydrate afterwards', feel:'Split it mentally into two halves of 3.'}
+  ]},
+ {n:4, phase:'base', title:'Down week', dates:'Aug 31 – Sep 6',
+  note:'Recovery week. Volume drops on purpose so the body absorbs the last three weeks.',
+  s:[
+    {type:'easy', mi:3, det:'Very easy continuous run', feel:'Enjoy it.'},
+    {type:'interval', mi:3.5, det:'1 mi warm-up + 4 × 400 m (200 m jog recovery) + 1 mi cool-down', feel:'Short and light.'},
+    {type:'long', mi:4, det:'Short, relaxed long run', feel:'Finish with energy to spare.'}
+  ]},
+ {n:5, phase:'build', title:'Second wave', dates:'Sep 7 – 13',
+  note:'Load comes back. From this week on, rehearse hydration and fuelling on the long run.',
+  s:[
+    {type:'easy', mi:3.5, det:'Continuous easy run', feel:'Conversational.'},
+    {type:'interval', mi:4.3, det:'1 mi warm-up + 6 × 400 m (200 m jog recovery) + 1 mi cool-down', feel:'Should feel better than week 3.'},
+    {type:'long', mi:7, det:'Easy long run + hydration test', feel:'Carry water. Try a gel at 45 min.'}
+  ]},
+ {n:6, phase:'build', title:'New territory', dates:'Sep 14 – 20',
+  note:'Reps get longer — 800s instead of 400s. Same effort, held twice as long.',
+  s:[
+    {type:'easy', mi:3.5, det:'Continuous easy run', feel:'Very easy, just movement.'},
+    {type:'interval', mi:4.5, det:'1 mi warm-up + 4 × 800 m (200 m jog recovery) + 1 mi cool-down', feel:'Slightly slower per 400 than your 400 reps. Do not chase it.'},
+    {type:'long', mi:8, det:'Long run at a slow, sustainable pace', feel:'Run 4 min / walk 1 min is a valid strategy.'}
+  ]},
+ {n:7, phase:'build', title:'Down week', dates:'Sep 21 – 27',
+  note:'Second recovery week. You are past the halfway point of the total load.',
+  s:[
+    {type:'easy', mi:3, det:'Very easy continuous run', feel:'Recovery.'},
+    {type:'interval', mi:3.9, det:'1 mi warm-up + 5 × 400 m (200 m jog recovery) + 1 mi cool-down', feel:'Short reps, sharp legs.'},
+    {type:'long', mi:6, det:'Shorter, comfortable long run', feel:'Good week to check shoes and kit.'}
+  ]},
+ {n:8, phase:'peak', title:'Heavy load', dates:'Sep 28 – Oct 4',
+  note:'Big week. Long run at 9 miles and your longest interval session so far.',
+  s:[
+    {type:'easy', mi:4, det:'Continuous easy run', feel:'Do not turn this into a tempo.'},
+    {type:'interval', mi:5.1, det:'1 mi warm-up + 5 × 800 m (200 m jog recovery) + 1 mi cool-down', feel:'Break it into blocks: 2 reps, 2 reps, 1 rep.'},
+    {type:'long', mi:9, det:'Long run with hydration and gel', feel:'Full nutrition rehearsal.'}
+  ]},
+ {n:9, phase:'peak', title:'Peak week', dates:'Oct 5 – 11',
+  note:'The high point of the plan. Ten miles on the long run — if you get here, the race is done.',
+  s:[
+    {type:'easy', mi:4, det:'Continuous easy run', feel:'Protect the legs for the long run.'},
+    {type:'interval', mi:5.1, det:'1 mi warm-up + 5 × 800 m at goal race pace (200 m jog recovery) + 1 mi cool-down', feel:'Practice the exact pace you want on race day.'},
+    {type:'long', mi:10, det:'Longest run · race kit and shoes', feel:'Full dress rehearsal: same time of day, same breakfast.'}
+  ]},
+ {n:10, phase:'taper', title:'Sharpening', dates:'Oct 12 – 18',
+  note:'Taper begins. Volume drops, intensity stays. You will feel extra energy — do not spend it.',
+  s:[
+    {type:'easy', mi:3, det:'Very easy continuous run', feel:'Fresh legs.'},
+    {type:'interval', mi:3.5, det:'1 mi warm-up + 4 × 400 m at goal race pace (200 m jog recovery) + 1 mi cool-down', feel:'Short and sharp.'},
+    {type:'long', mi:7, det:'Final long run, comfortable', feel:'Finish wanting more.'}
+  ]},
+ {n:11, phase:'race', title:'Race week', dates:'Oct 19 – 25',
+  note:'Low volume, high rest. Sleep, hydrate, and trust the last ten weeks. The fitness is already built.',
+  s:[
+    {type:'easy', mi:2, det:'Very short, very easy run', feel:'Just turning the legs over.'},
+    {type:'interval', mi:3, det:'2 mi easy + 4 × 100 m strides', feel:'Activation, not training.'},
+    {type:'race', mi:13.1, det:'RACE DAY · start slow, finish strong', feel:'The first 3 miles should feel too easy.'}
+  ]}
+];
+
+const PHASE_COLOR = {base:'#2F6F8F', build:'#C4553C', peak:'#8A5B2E', taper:'#4B7A52', race:'#B4283C'};
+const TYPE_LABEL  = {easy:'Slow', interval:'Interval', long:'Long run', race:'Race'};
+const ORDINAL     = ['Run 1','Run 2','Run 3'];
+
+let unit='mi';
+let logged={};   // key "week-index" -> MILES (always stored in miles)
+
+/* ---------- storage ---------- */
+const KEY='hm2026';
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify({logged,unit})); }catch(e){} }
+function load(){
+  try{
+    const raw=localStorage.getItem(KEY); if(!raw) return;
+    const d=JSON.parse(raw); logged=d.logged||{}; unit=d.unit||'mi';
+  }catch(e){}
+}
+function storageWorks(){
+  try{ localStorage.setItem('__t','1'); localStorage.removeItem('__t'); return true; }catch(e){ return false; }
+}
+function resetAll(){
+  if(!confirm('Clear all logged miles?')) return;
+  logged={};
+  try{ localStorage.removeItem(KEY); }catch(e){}
+  render();
+}
+
+/* ---------- helpers ---------- */
+function conv(mi){ return unit==='km' ? mi*1.60934 : mi; }
+function toMiles(v){ return unit==='km' ? v/1.60934 : v; }
+function fmt(mi){ return conv(mi).toFixed(1).replace(/\.0$/,'') + ' ' + unit; }
+function num(mi){ return conv(mi).toFixed(1).replace(/\.0$/,''); }
+function weekPlan(w){ return w.s.reduce((a,x)=>a+x.mi,0); }
+function weekActual(w){ return w.s.reduce((a,x,i)=>a+(logged[w.n+'-'+i]||0),0); }
+function totalLogged(){ return PLAN.reduce((a,w)=>a+weekActual(w),0); }
+function runsLogged(){ return Object.values(logged).filter(v=>v>0).length; }
+
+function setUnit(u){
+  unit=u;
+  document.getElementById('btnMi').classList.toggle('on',u==='mi');
+  document.getElementById('btnKm').classList.toggle('on',u==='km');
+  save(); render();
+}
+
+function toggleWeek(n){ document.getElementById('w'+n).classList.toggle('open'); }
+
+function setLog(wn,si,val){
+  const k=wn+'-'+si;
+  if(val===''||val===null){ delete logged[k]; }
+  else{ logged[k] = Math.max(0, toMiles(parseFloat(val)||0)); }
+  save();
+  renderCharts(); renderStats(); renderProgressText(); refreshWeekTotals();
+  const row=document.getElementById('d'+k);
+  if(row) row.outerHTML = deltaHtml(wn,si);
+}
+
+function deltaHtml(wn,si){
+  const w=PLAN.find(x=>x.n===wn), k=wn+'-'+si, v=logged[k];
+  let cls='dn', txt='';
+  if(v>0){
+    const diff=v-w.s[si].mi;
+    if(Math.abs(diff)<0.15){ cls='ok'; txt='on plan'; }
+    else if(diff>0){ cls='up'; txt='+'+num(diff)+' '+unit; }
+    else{ cls='dn'; txt=num(diff)+' '+unit; }
+  }
+  return `<span class="delta ${cls}" id="d${k}">${txt}</span>`;
+}
+
+/* ---------- render ---------- */
+function renderCountdown(){
+  const d=Math.max(0,Math.floor((RACE-new Date())/86400000));
+  document.getElementById('cd').innerHTML=`
+    <div class="cd-box"><div class="cd-num">${d}</div><div class="cd-lab">Days</div></div>
+    <div class="cd-box"><div class="cd-num">${Math.floor(d/7)}</div><div class="cd-lab">Weeks</div></div>
+    <div class="cd-box"><div class="cd-num">${d%7}</div><div class="cd-lab">And days</div></div>
+    <div class="cd-box" style="background:rgba(180,40,60,.25);border-color:rgba(180,40,60,.5)">
+      <div class="cd-num">25</div><div class="cd-lab">Oct 2026</div></div>`;
+}
+
+function renderStats(){
+  const totals=PLAN.map(weekPlan);
+  document.getElementById('stTotal').textContent=fmt(totals.reduce((a,b)=>a+b,0));
+  document.getElementById('stPeak').textContent =fmt(Math.max(...totals));
+  document.getElementById('stLong').textContent =fmt(Math.max(...PLAN.flatMap(w=>w.s.filter(s=>s.type==='long'||s.type==='race').map(s=>s.mi))));
+  const lg=totalLogged();
+  document.getElementById('stLogged').textContent = lg>0 ? fmt(lg) : '—';
+}
+
+function renderCharts(){
+  const plans=PLAN.map(weekPlan);
+  const acts =PLAN.map(weekActual);
+
+  // Chart 1 — planned only
+  const max1=Math.max(...plans);
+  document.getElementById('bars').innerHTML=PLAN.map((w,i)=>`
+    <div class="bar-col" onclick="toggleWeek(${w.n});document.getElementById('w${w.n}').scrollIntoView({behavior:'smooth',block:'center'})">
+      <div class="bar-val">${conv(plans[i]).toFixed(0)}</div>
+      <div class="bar-track">
+        <div class="bar" style="height:${(plans[i]/max1*100).toFixed(1)}%;background:${PHASE_COLOR[w.phase]}"></div>
+      </div>
+      <div class="bar-lab">${w.n}</div>
+    </div>`).join('');
+
+  // Chart 2 — planned vs actual
+  const max2=Math.max(...plans,...acts,1);
+  document.getElementById('pbars').innerHTML=PLAN.map((w,i)=>`
+    <div class="bar-col">
+      <div class="bar-val">${acts[i]>0?conv(acts[i]).toFixed(0):''}</div>
+      <div class="bar-track">
+        <div class="p-plan" style="height:${(plans[i]/max2*100).toFixed(1)}%"></div>
+        <div class="p-act ${acts[i]>plans[i]*1.05?'over':''}" style="height:${(acts[i]/max2*100).toFixed(1)}%"></div>
+      </div>
+      <div class="bar-lab">${w.n}</div>
+    </div>`).join('');
+}
+
+function refreshWeekTotals(){
+  PLAN.forEach(w=>{
+    const el=document.getElementById('ran'+w.n);
+    if(el){ const a=weekActual(w); el.textContent = a>0 ? 'ran '+fmt(a) : ''; }
+  });
+}
+
+function renderWeeks(){
+  document.getElementById('weeks').innerHTML=PLAN.map(w=>{
+    const open=document.getElementById('w'+w.n)?.classList.contains('open');
+    const a=weekActual(w);
+    const sessions=w.s.map((s,i)=>{
+      const k=w.n+'-'+i;
+      const v=logged[k]!==undefined ? num(logged[k]) : '';
+      return `<div class="session">
+        <div class="s-body">
+          <div class="s-top">
+            <span class="s-order">${ORDINAL[i]}</span>
+            <span class="tag ${s.type}">${TYPE_LABEL[s.type]}</span>
+            <span class="s-dist">${fmt(s.mi)}</span>
+          </div>
+          <div class="s-detail">${s.det}</div>
+          <div class="s-feel">${s.feel}</div>
+          <div class="s-log">
+            <label for="i${k}">I ran</label>
+            <input id="i${k}" type="number" inputmode="decimal" step="0.1" min="0"
+                   placeholder="${num(s.mi)}" value="${v}"
+                   onchange="setLog(${w.n},${i},this.value)">
+            <span class="u">${unit}</span>
+            ${deltaHtml(w.n,i)}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="week ${w.phase} ${open?'open':''}" id="w${w.n}">
+      <div class="week-head" onclick="toggleWeek(${w.n})">
+        <div class="wnum">${w.n}</div>
+        <div class="wmeta">
+          <div class="wtitle">${w.title}</div>
+          <div class="wdates">${w.dates}</div>
+        </div>
+        <div class="wtotal">
+          <b>${fmt(weekPlan(w))}</b>
+          <span>Planned</span>
+          <div class="ran" id="ran${w.n}">${a>0?'ran '+fmt(a):''}</div>
+        </div>
+        <svg class="chev" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.3 7.3a1 1 0 011.4 0L10 10.6l3.3-3.3a1 1 0 111.4 1.4l-4 4a1 1 0 01-1.4 0l-4-4a1 1 0 010-1.4z" clip-rule="evenodd"/></svg>
+      </div>
+      <div class="week-body">
+        <div class="wnote">${w.note}</div>
+        ${sessions}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderProgressText(){
+  const total=PLAN.reduce((a,w)=>a+w.s.length,0);
+  document.getElementById('progTxt').textContent=`${runsLogged()} of ${total} runs logged`;
+}
+
+function render(){ renderStats(); renderCharts(); renderWeeks(); renderProgressText(); }
+
+/* ---------- init ---------- */
+load();
+document.getElementById('btnMi').classList.toggle('on',unit==='mi');
+document.getElementById('btnKm').classList.toggle('on',unit==='km');
+document.getElementById('saveNote').textContent = storageWorks()
+  ? 'Your logged runs are saved on this device automatically.'
+  : 'Saving is off in this preview — it works once the file is opened in a browser.';
+renderCountdown();
+render();
+setInterval(renderCountdown,60000);
+</script>
+</body>
+</html>
