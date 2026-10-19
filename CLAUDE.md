@@ -95,6 +95,13 @@ wired as the `training-plan` config.
 Commit and push to `main`; Pages redeploys in under a minute. Files are UTF-8 and
 contain `·`, `×`, `–`, `→` — keep them that way.
 
+**Bump the `?v=` on every asset link in the plan HTML whenever anything in `assets/`
+or `plans/` changes.** Pages serves everything with `Cache-Control: max-age=600`, so
+without a new query string a browser will happily pair the new HTML with up to
+10-minute-old CSS/JS. That happened once (Oct 19): the athlete saw the new nav as bare
+links on top of the old layout. Use one version string for all links on the page,
+format `YYYY-MM-DD.N`.
+
 ## Page structure
 
 Hash-routed views, no framework: `#dashboard` (default) · `#weeks` · `#paces` ·
