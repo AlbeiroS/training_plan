@@ -37,14 +37,23 @@ index.html                   the Oct 2026 half plan — self-contained, pre-refa
 road-to-boston-2027.html     thin page, ~40 lines
 assets/plan.css              shared styles for every derived plan
 assets/plan.js               shared renderer + logger
-plans/road-to-boston-2027.json   plan data
+plans/road-to-boston-2027.js plan data (sets window.PLAN_DATA)
 ```
 
-Adding a race = one JSON file plus one thin HTML page. `index.html` still holds the
+Adding a race = one data file plus one thin HTML page. `index.html` still holds the
 old half-marathon plan inline; fold it into the shared renderer and turn the root into
 a hub when convenient.
 
-## Plan JSON shape
+**Why the plan data is `.js` and not `.json`:** so the page works when opened straight
+off disk by double-clicking. `file://` origin rules block `fetch()` but not
+`<script src>`, so the data is assigned to `window.PLAN_DATA` by its own script tag.
+Load order in the page matters — data file first, then `assets/plan.js`, then
+`renderPlan()`. `renderPlan(url)` still accepts a URL and will fetch it when no global
+is present, but nothing uses that path today.
+
+## Plan data shape
+
+The file is `window.PLAN_DATA = { ... };` wrapping this object:
 
 ```jsonc
 {
@@ -65,8 +74,8 @@ not computed, so it must equal the sum of that week's `mi`.
 
 ## Local preview
 
-`plan.js` fetches the JSON, so opening the HTML off disk is blocked by `file://`
-origin rules. Serve it:
+Double-clicking `road-to-boston-2027.html` works — no server needed. To serve the
+folder anyway (closer to how Pages behaves):
 
 ```bash
 python -m http.server 8777

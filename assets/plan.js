@@ -1,9 +1,12 @@
 /* Shared renderer + logger for every plan in this repo.
-   Usage:  <script src="assets/plan.js"></script>
-           <script>renderPlan('plans/road-to-boston-2027.json')</script>
-   Note: this fetches a JSON file, so the page must be SERVED (GitHub Pages, or
-   `python -m http.server`). Opening the .html straight off disk will be blocked
-   by the browser's file:// origin rules — the page says so if that happens. */
+   Usage:  <script src="plans/<plan>.js"></script>   <!-- sets window.PLAN_DATA -->
+           <script src="assets/plan.js"></script>
+           <script>renderPlan()</script>
+
+   The plan data arrives as a global from a <script> tag rather than a fetched
+   .json, so the page works when opened straight off disk: file:// origin rules
+   block fetch() but not <script src>. renderPlan() still accepts a URL as a
+   fallback for anything served over http. */
 
 (function () {
   'use strict';
@@ -290,38 +293,49 @@
   }
 
   /* ---------- entry point ---------- */
+  function build(data) {
+    PLAN = data;
+    KEY = data.storageKey || data.id;
+    load();
+    document.title = data.title + ' · ' + data.kicker;
+    renderHero(); renderStats(); renderPaces(); renderPhases();
+    renderWeeks(); openCurrentWeek(); renderBar();
+
+    if (!storageWorks()) {
+      document.querySelector('.wrap').appendChild(el('div', 'warn',
+        'This browser is blocking local storage, so logged runs will not be ' +
+        'remembered. Private windows and blocked site data both do this.'));
+    }
+    document.getElementById('btnExport').onclick = exportLog;
+    document.getElementById('btnImport').onclick = importLog;
+    document.getElementById('btnReset').onclick = resetLog;
+  }
+
+  function fail(msg) {
+    document.getElementById('weeks').innerHTML =
+      '<div class="warn"><strong>Could not load the plan data.</strong><br>' + msg + '</div>';
+  }
+
+  /* Prefers window.PLAN_DATA, set by the plan's own <script> tag — that is what
+     makes the page work off disk. Falls back to fetching a URL when served. */
   window.renderPlan = function (src) {
+    if (window.PLAN_DATA) { build(window.PLAN_DATA); return; }
+    if (!src) {
+      fail('No plan loaded. The page should include its data file with ' +
+           '<code>&lt;script src="plans/&lt;plan&gt;.js"&gt;</code> before this script.');
+      return;
+    }
     fetch(src)
       .then(function (r) {
         if (!r.ok) throw new Error('HTTP ' + r.status);
         return r.json();
       })
-      .then(function (data) {
-        PLAN = data;
-        KEY = data.storageKey || data.id;
-        load();
-        document.title = data.title + ' · ' + data.kicker;
-        renderHero(); renderStats(); renderPaces(); renderPhases();
-        renderWeeks(); openCurrentWeek(); renderBar();
-
-        if (!storageWorks()) {
-          var w = el('div', 'warn',
-            'This browser is blocking local storage, so logged runs will not be remembered. ' +
-            'Private windows and blocked site data both do this.');
-          document.querySelector('.wrap').appendChild(w);
-        }
-        document.getElementById('btnExport').onclick = exportLog;
-        document.getElementById('btnImport').onclick = importLog;
-        document.getElementById('btnReset').onclick = resetLog;
-      })
+      .then(build)
       .catch(function (err) {
-        document.getElementById('weeks').innerHTML =
-          '<div class="warn"><strong>Could not load the plan data.</strong><br>' +
-          'If you opened this file straight off your disk, the browser blocks the ' +
-          'fetch of <code>' + esc(src) + '</code>. Use the published GitHub Pages ' +
-          'link instead, or serve the folder locally with ' +
-          '<code>python -m http.server</code> and open ' +
-          '<code>http://localhost:8000</code>.<br><small>' + esc(err.message) + '</small></div>';
+        fail('Tried to fetch <code>' + esc(src) + '</code> and failed. ' +
+             'Opening the page off disk blocks fetch — serve the folder with ' +
+             '<code>python -m http.server 8777</code> instead.' +
+             '<br><small>' + esc(err.message) + '</small>');
       });
   };
 })();

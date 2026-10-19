@@ -1,4 +1,6 @@
-{
+/* Plan data. Assigned to a global rather than served as .json so the page
+   works when opened straight off disk - file:// blocks fetch(), not <script>. */
+window.PLAN_DATA = {
   "id": "road-to-boston-2027",
   "title": "Road to Boston",
   "kicker": "25 Weeks · Two Marathons",
@@ -245,4 +247,4 @@
         { "day": "Mon", "type": "race",     "mi": 26.2,"det": "BOSTON MARATHON · Patriots' Day", "feel": "Hold back on the descent to mile 16 — that is the whole race. Newton is survivable on fresh quads and brutal on spent ones." }
       ] }
   ]
-}
+};
