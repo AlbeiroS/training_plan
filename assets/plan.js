@@ -210,6 +210,12 @@
             ev.stopPropagation();
             if (logged[id]) delete logged[id]; else logged[id] = true;
             save();
+            if (window.PlanSync) {
+              PlanSync.record({
+                key: id, week: w.n, session: i, day: s.day,
+                type: s.type, miles: s.mi, done: !!logged[id]
+              });
+            }
             redrawKeepingOpen();
           };
           sr.appendChild(b);
@@ -314,6 +320,41 @@
     document.getElementById('btnExport').onclick = exportLog;
     document.getElementById('btnImport').onclick = importLog;
     document.getElementById('btnReset').onclick = resetLog;
+
+    startSync();
+  }
+
+  /* ---------- sheet sync (no-op until assets/sync-config.js is filled in) ---------- */
+  function startSync() {
+    var dot = document.getElementById('syncDot');
+    if (!window.PlanSync || !PlanSync.enabled()) {
+      if (dot) {
+        dot.className = 'sync local';
+        dot.title = 'Logs are stored in this browser only. Clearing site data ' +
+                    'erases them — use Export for backups, or set up Sheet sync.';
+        dot.textContent = 'local only';
+      }
+      return;
+    }
+    PlanSync.init(PLAN.id, KEY);
+    PlanSync.onStatus(function (state, detail) {
+      if (!dot) return;
+      var pend = PlanSync.pendingCount();
+      dot.className = 'sync ' + state;
+      dot.textContent = state === 'syncing' ? 'syncing…'
+                      : state === 'offline' ? (pend ? pend + ' waiting' : 'offline')
+                      : 'synced';
+      dot.title = state === 'offline'
+        ? 'Could not reach the Sheet (' + (detail || '') + '). Your runs are ' +
+          'saved here and will send themselves when you are back online.'
+        : 'Logged runs are saved to your Google Sheet.';
+    });
+    PlanSync.pull().then(function (remote) {
+      if (!remote) return;
+      logged = remote;
+      save();
+      redrawKeepingOpen();
+    });
   }
 
   function fail(msg) {

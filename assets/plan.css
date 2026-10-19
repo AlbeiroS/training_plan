@@ -133,6 +133,13 @@ p.sec-sub{color:var(--muted);font-size:.88rem;margin-bottom:16px}
 .bar .prog-t{font-size:.66rem;letter-spacing:.11em;text-transform:uppercase;color:#9AA3B2;margin-bottom:5px}
 .bar .track{height:6px;background:rgba(255,255,255,.14);border-radius:4px;overflow:hidden}
 .bar .fill{height:100%;background:var(--race);border-radius:4px;transition:width .3s}
+.sync{font-size:.62rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  padding:4px 9px;border-radius:20px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+.sync::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;flex:0 0 auto}
+.sync.ok{color:#8FD4A0;background:rgba(75,122,82,.22)}
+.sync.syncing{color:#D9C68A;background:rgba(138,91,46,.22)}
+.sync.offline{color:#E79A9A;background:rgba(180,40,60,.22)}
+.sync.local{color:#9AA3B2;background:rgba(255,255,255,.08)}
 .bar button{font-family:var(--f-body);font-size:.7rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
   background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:var(--paper);
   border-radius:20px;padding:6px 12px;cursor:pointer}
@@ -150,6 +157,8 @@ p.sec-sub{color:var(--muted);font-size:.88rem;margin-bottom:16px}
   .bar .prog{flex:1 1 auto;min-width:0}
   .bar .prog-t{font-size:.6rem;letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .bar button{padding:5px 9px;font-size:.62rem;letter-spacing:.04em}
+  .sync{padding:4px 7px;font-size:.55rem;letter-spacing:.03em}
+  .sync::before{width:6px;height:6px}
 }
 @media print{
   .bar,.logbtn{display:none}

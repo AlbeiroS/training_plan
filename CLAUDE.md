@@ -34,11 +34,17 @@ real daily structure lives in the derived plan JSON here.
 
 ```
 index.html                   the Oct 2026 half plan — self-contained, pre-refactor
-road-to-boston-2027.html     thin page, ~40 lines
+road-to-boston-2027.html     thin page, ~50 lines
 assets/plan.css              shared styles for every derived plan
 assets/plan.js               shared renderer + logger
+assets/charts.js             inline-SVG charts
+assets/sync.js               log sync to a Google Sheet
+assets/sync-config.js        the /exec URL + token (empty = local-only)
+apps-script/Code.gs          the Sheet-side endpoint, pasted into Apps Script
 plans/road-to-boston-2027.js plan data (sets window.PLAN_DATA)
 ```
+
+Script order in the page matters: plan data → sync-config → sync → charts → plan.
 
 Adding a race = one data file plus one thin HTML page. `index.html` still holds the
 old half-marathon plan inline; fold it into the shared renderer and turn the root into
@@ -90,9 +96,40 @@ Commit and push to `main`; Pages redeploys in under a minute. Files are UTF-8 an
 contain `·`, `×`, `–`, `→` — keep them that way. Non-ASCII in the JSON is written as
 `\uXXXX` escapes deliberately, so the data file survives any editor.
 
-## Logging
+## Logging and sync
 
-Runs are logged to `localStorage` under `storageKey`, with export/import JSON buttons
-as the backup path. Planned next step: a Google Apps Script Web App as a thin JSON
-endpoint writing to a Sheet, so the log is cross-device — the page writing locally
-first and syncing when online. Plans stay in git; only the log moves to the Sheet.
+Two tiers, and the split is the point: **plans live in git, logs live in a Sheet.**
+Authored content wants version history; captured data wants to be queryable and to
+outlive any one device.
+
+- `localStorage` under `storageKey` is always written first, so the UI never waits on
+  the network and logging works with no signal. It does **not** survive clearing site
+  data — the Export/Import JSON buttons are the manual backup path.
+- `assets/sync.js` + `apps-script/Code.gs` push the log to a Google Sheet. Toggles
+  queue in `<storageKey>:pending` and flush when they can; on load the Sheet is the
+  source of truth with anything pending applied on top. The bottom bar shows
+  `synced` / `syncing` / `offline` / `local only`.
+
+Sync is **off** until `assets/sync-config.js` has a `/exec` URL and token — with it
+empty everything still works, just locally. Setup steps are in the header comment of
+`apps-script/Code.gs`.
+
+The POST deliberately uses `Content-Type: text/plain` so the browser treats it as a
+simple request and sends no CORS preflight — Apps Script does not answer `OPTIONS`.
+Don't "fix" that to `application/json`; it breaks the write path.
+
+Security: a public static page cannot hold a secret, so the token is visible in
+source. This is obscure, not secure. The Sheet's revision history is the undo.
+
+## Charts
+
+`assets/charts.js`, hand-rolled inline SVG — no charting library, so the page works
+off disk and offline. Three charts: weekly volume (columns), long run (line), and
+cumulative planned-vs-logged.
+
+Phase identity is carried by the labelled band under the x-axis, **never by bar hue**.
+The seven UI phase colours fail pairwise CVD separation as large fills (stride
+`#4B7A52` vs recovery `#7A7669` is ΔE 7.8 even in normal vision) — fine beside a text
+label in the UI, wrong in a 25-bar chart. Charts use a single blue `#1C6E9E` with the
+races in `#B4283C`; that pair validates at ΔE 16.6 protan / 26.5 normal. If you add a
+chart colour, validate it rather than eyeballing it.
