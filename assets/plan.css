@@ -110,8 +110,19 @@ p.sec-sub{color:var(--muted);font-size:.88rem;margin-bottom:16px}
 
 /* ---------- CHARTS ---------- */
 .chart-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 16px 10px;margin-bottom:12px}
+.chart-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 .chart-card h3{font-family:var(--f-head);font-weight:800;font-size:1.2rem;text-transform:uppercase;letter-spacing:.03em}
 .chart-card > p{color:var(--muted);font-size:.82rem;margin:2px 0 10px;line-height:1.45}
+.chart-stat{font-size:.86rem;font-weight:700;color:var(--ink);margin:-4px 0 10px;line-height:1.45}
+.chart-stat span{font-weight:500;color:var(--ink-2)}
+
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:20px;overflow:hidden;flex:0 0 auto}
+.seg button{font-size:.64rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+  background:transparent;border:0;color:var(--muted);padding:0 12px;min-height:30px;cursor:pointer}
+.seg button + button{border-left:1px solid var(--line)}
+.seg button.on{background:var(--ink);color:var(--paper)}
+.seg button:not(.on):hover{color:var(--ink)}
+.seg button:focus-visible{outline:2px solid var(--logged);outline-offset:-2px}
 .chart-scroll{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}
 .chart-scroll svg{display:block;width:100%;height:auto}
 .chart-legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:6px}

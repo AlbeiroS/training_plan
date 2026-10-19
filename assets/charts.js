@@ -90,6 +90,7 @@
     var band = (W - PADL - PADR) / o.n;
     if (o.now) {
       var x = PADL + o.now.idx * band;
+      svg.setAttribute('data-now-x', String(x + band / 2));
       svg.appendChild(svgEl('rect', { x: x, y: PADT - 8, width: band, height: plotH + 8, rx: 4, fill: NOWBG }));
       text(svg, x + band / 2, PADT - 14, o.now.started ? 'NOW' : 'NEXT',
            { size: 9.5, weight: 700, ls: '.1em' });
@@ -102,10 +103,17 @@
     return { svg: svg, plotH: plotH, band: band };
   }
 
-  function xLabels(svg, weeks, band, y) {
+  function xLabels(svg, weeks, band, y, every) {
     weeks.forEach(function (w, i) {
-      if (i === 0 || w.n % 4 === 0) text(svg, PADL + i * band + band / 2, y, w.n);
+      if (every === 1 || i === 0 || w.n % 4 === 0) text(svg, PADL + i * band + band / 2, y, w.n);
     });
+  }
+
+  /* A clean tick step that gives at most five gridlines. */
+  function niceStep(max) {
+    var steps = [5, 10, 20, 25, 50, 100, 200, 250, 500];
+    for (var k = 0; k < steps.length; k++) if (max / steps[k] <= 5) return steps[k];
+    return 1000;
   }
 
   function hitBands(svg, weeks, band, plotH, htmlFor) {
@@ -173,7 +181,7 @@
       return tipHead(w) + '<span>Planned ' + fmt(planned[i]) + ' mi</span>' +
              '<span>Logged ' + (actual[i] > 0 ? fmt(actual[i]) + ' mi' : '—') + '</span>';
     });
-    return svg;
+    return { svg: svg };
   }
 
   /* ================= 2 · long run ================= */
@@ -237,9 +245,11 @@
       last = i;
     });
     flushSeg();
+    /* r=5: a logged run usually lands right on its planned gray dot, and an
+       equal-sized blue dot reads as "nothing logged" */
     actual.forEach(function (v, i) {
       if (v == null) return;
-      svg.appendChild(svgEl('circle', { cx: px(i), cy: py(v), r: 4, fill: BLUE, stroke: SURF, 'stroke-width': 2 }));
+      svg.appendChild(svgEl('circle', { cx: px(i), cy: py(v), r: 5, fill: BLUE, stroke: SURF, 'stroke-width': 2 }));
     });
     if (last >= 0) {
       var right = px(last) > W - 70;
@@ -253,14 +263,26 @@
              '<span>Planned ' + fmt(planned[i]) + ' mi</span>' +
              '<span>Logged ' + (actual[i] != null ? fmt(actual[i]) + ' mi' : '—') + '</span>';
     });
-    return svg;
+
+    var count = actual.filter(function (v) { return v != null; }).length;
+    var stat = count
+      ? count + ' of ' + n + ' long runs logged <span>· latest ' + fmt(actual[last]) +
+        ' mi in week ' + weeks[last].n + ' (planned ' + fmt(planned[last]) + ')</span>'
+      : 'No long run logged yet <span>· this chart follows each week\'s key session — ' +
+        'the Saturday long run, or the race. Weekday runs count in the other two charts.</span>';
+    return { svg: svg, stat: stat };
   }
 
   /* ================= 3 · cumulative ================= */
-  function cumulativeChart(plan, getLog, now) {
-    var weeks = plan.weeks, n = weeks.length, H = 226, PADB = 34;
+  /* range 'todate' zooms to the weeks so far (plus a little runway): on the
+     whole-block scale of ~1,000 miles, the first weeks are a few pixels tall and
+     read as a flat line on zero. 'block' shows all of it. Both lines start
+     from a zero origin at the left edge, so even one logged week draws a line
+     rather than a lone dot. */
+  function cumulativeChart(plan, getLog, now, range) {
+    var all = plan.weeks, H = 226, PADB = 34;
     var planned = [], actual = [], p = 0, a = 0, lastLogged = -1;
-    weeks.forEach(function (w, i) {
+    all.forEach(function (w, i) {
       p += w.total;
       w.s.forEach(function (s, k) {
         var L = getLog(w.n, k);
@@ -268,39 +290,50 @@
       });
       planned.push(p); actual.push(a);
     });
-    /* the logged line runs to today (or the last log), never on into the future */
-    var endIdx = lastLogged < 0 ? -1 : Math.max(lastLogged, now && now.started ? now.idx : 0);
-    var yMax = Math.max(250, Math.ceil(Math.max(p, a) / 250) * 250);
 
-    var f = frame({ H: H, PADB: PADB, n: n, yMax: yMax, step: 250, now: now,
+    var here = !now ? 0 : now.over ? all.length - 1 : now.started ? now.idx : 0;
+    /* the logged line runs to today (or the last log), never on into the future */
+    var endIdx = lastLogged < 0 ? -1 : Math.max(lastLogged, here);
+    var nShow = range === 'block' ? all.length
+              : Math.max(4, Math.min(all.length, Math.max(lastLogged, here) + 2));
+    var weeks = all.slice(0, nShow);
+    var lastShown = nShow - 1, endShown = Math.min(endIdx, lastShown);
+
+    var top = Math.max(planned[lastShown], endShown >= 0 ? actual[endShown] : 0, 1);
+    var step = niceStep(top), yMax = Math.ceil(top / step) * step;
+
+    var f = frame({ H: H, PADB: PADB, n: nShow, yMax: yMax, step: step,
+                    now: now && !now.over && now.idx < nShow ? now : null,
                     label: 'Cumulative planned miles against cumulative logged miles' });
     var svg = f.svg, plotH = f.plotH, band = f.band;
     function px(i) { return PADL + i * band + band / 2; }
     function py(v) { return PADT + plotH - (v / yMax) * plotH; }
     function path(arr, upto) {
-      var d = '';
-      for (var i = 0; i <= upto; i++) d += (i ? 'L' : 'M') + px(i) + ',' + py(arr[i]);
+      var d = 'M' + PADL + ',' + py(0);
+      for (var i = 0; i <= upto; i++) d += 'L' + px(i) + ',' + py(arr[i]);
       return d;
     }
 
     svg.appendChild(svgEl('path', {
-      d: path(planned, n - 1), fill: 'none', stroke: GRAY, 'stroke-width': 2,
+      d: path(planned, lastShown), fill: 'none', stroke: GRAY, 'stroke-width': 2,
       'stroke-linejoin': 'round', 'stroke-linecap': 'round'
     }));
-    text(svg, W - PADR, py(p) - 10, Math.round(p) + ' mi', { anchor: 'end', fill: INK, size: 12, weight: 700 });
+    /* label sits on the end of the gray line, not floating at the chart edge */
+    text(svg, px(lastShown), py(planned[lastShown]) - 10, Math.round(planned[lastShown]) + ' mi',
+         { anchor: 'end', fill: INK, size: 12, weight: 700 });
 
-    if (endIdx >= 0) {
+    if (endShown >= 0) {
       svg.appendChild(svgEl('path', {
-        d: path(actual, endIdx), fill: 'none', stroke: BLUE, 'stroke-width': 2,
+        d: path(actual, endShown), fill: 'none', stroke: BLUE, 'stroke-width': 2,
         'stroke-linejoin': 'round', 'stroke-linecap': 'round'
       }));
-      svg.appendChild(svgEl('circle', { cx: px(endIdx), cy: py(actual[endIdx]), r: 4, fill: BLUE, stroke: SURF, 'stroke-width': 2 }));
-      var right = px(endIdx) > W - 90;
-      text(svg, px(endIdx) + (right ? -9 : 9), py(actual[endIdx]) + 17, fmt(actual[endIdx]) + ' mi',
+      svg.appendChild(svgEl('circle', { cx: px(endShown), cy: py(actual[endShown]), r: 5, fill: BLUE, stroke: SURF, 'stroke-width': 2 }));
+      var right = px(endShown) > W - 90;
+      text(svg, px(endShown) + (right ? -10 : 10), py(actual[endShown]) + 17, fmt(actual[endShown]) + ' mi',
            { anchor: right ? 'end' : 'start', fill: INK, size: 12, weight: 700 });
     }
 
-    xLabels(svg, weeks, band, PADT + plotH + 18);
+    xLabels(svg, weeks, band, PADT + plotH + 18, nShow <= 12 ? 1 : 4);
     hitBands(svg, weeks, band, plotH, function (w, i) {
       var diff = actual[i] - planned[i];
       return tipHead(w) +
@@ -309,7 +342,16 @@
           ? '<span>Logged to date ' + fmt(actual[i]) + ' mi (' + (diff >= 0 ? '+' : '') + fmt(diff) + ')</span>'
           : '');
     });
-    return svg;
+
+    var stat;
+    if (endIdx < 0) stat = 'Nothing logged yet';
+    else {
+      var d = actual[endIdx] - planned[endIdx];
+      stat = fmt(actual[endIdx]) + ' mi logged <span>· plan through week ' + all[endIdx].n + ': ' +
+             fmt(planned[endIdx]) + ' mi' +
+             (now && now.started ? ' (' + (d >= 0 ? '+' : '') + fmt(d) + ')' : '') + '</span>';
+    }
+    return { svg: svg, stat: stat };
   }
 
   /* ---------- assembly ---------- */
@@ -328,46 +370,101 @@
     return l;
   }
 
-  function card(title, sub, legend, svg) {
+  /* o = { title, sub, legend, chart: {svg, stat}, control } */
+  function card(o) {
     var c = document.createElement('div');
     c.className = 'chart-card';
+    var head = document.createElement('div');
+    head.className = 'chart-head';
     var h = document.createElement('h3');
-    h.textContent = title;
-    c.appendChild(h);
+    h.textContent = o.title;
+    head.appendChild(h);
+    if (o.control) head.appendChild(o.control);
+    c.appendChild(head);
     var p = document.createElement('p');
-    p.textContent = sub;
+    p.textContent = o.sub;
     c.appendChild(p);
-    c.appendChild(legend);
+    if (o.chart.stat) {
+      var s = document.createElement('div');
+      s.className = 'chart-stat';
+      s.innerHTML = o.chart.stat;
+      c.appendChild(s);
+    }
+    c.appendChild(o.legend);
     var scroll = document.createElement('div');
     scroll.className = 'chart-scroll';
-    scroll.appendChild(svg);
+    scroll.appendChild(o.chart.svg);
     c.appendChild(scroll);
     return c;
+  }
+
+  /* A zoom on the cumulative chart's own axis — not a data filter — so it
+     lives on that card. Remembered per browser; it is only a convenience. */
+  function rangeKey(plan) { return (plan.storageKey || plan.id) + ':cumRange'; }
+  function getRange(plan) {
+    try { return localStorage.getItem(rangeKey(plan)) === 'block' ? 'block' : 'todate'; }
+    catch (e) { return 'todate'; }
+  }
+  function rangeControl(plan, current, onChange) {
+    var seg = document.createElement('div');
+    seg.className = 'seg';
+    seg.setAttribute('role', 'group');
+    seg.setAttribute('aria-label', 'Cumulative chart range');
+    [['todate', 'To date'], ['block', 'Whole block']].forEach(function (opt) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = opt[1];
+      b.className = opt[0] === current ? 'on' : '';
+      b.setAttribute('aria-pressed', opt[0] === current ? 'true' : 'false');
+      b.onclick = function () {
+        try { localStorage.setItem(rangeKey(plan), opt[0]); } catch (e) {}
+        onChange();
+      };
+      seg.appendChild(b);
+    });
+    return seg;
   }
 
   window.renderCharts = function (plan, getLog, now) {
     var host = document.getElementById('charts');
     if (!host) return;
     var at = now && !now.over ? now : null;
+    var range = getRange(plan);
     hideTip();
     host.innerHTML = '';
-    host.appendChild(card(
-      'Weekly volume',
-      'Each week: planned on the left, what you logged on the right. The strip underneath is the phase.',
-      legendOf([['Planned', GRAY, 'key-bar'], ['Logged', BLUE, 'key-bar'], ['Race', RED]]),
-      weeklyChart(plan, getLog, at)
-    ));
-    host.appendChild(card(
-      'Long run',
-      'The key session of each week — 10 miles to 21, then the race itself.',
-      legendOf([['Planned', GRAY, 'key-line'], ['Logged', BLUE, 'key-line'], ['Race', RED]]),
-      longRunChart(plan, getLog, at)
-    ));
-    host.appendChild(card(
-      'Cumulative miles',
-      'Running total against the plan. The blue line stops at today.',
-      legendOf([['Planned', GRAY, 'key-line'], ['Logged', BLUE, 'key-line']]),
-      cumulativeChart(plan, getLog, at)
-    ));
+    host.appendChild(card({
+      title: 'Weekly volume',
+      sub: 'Each week: planned on the left, what you logged on the right. The strip underneath is the phase.',
+      legend: legendOf([['Planned', GRAY, 'key-bar'], ['Logged', BLUE, 'key-bar'], ['Race', RED]]),
+      chart: weeklyChart(plan, getLog, at)
+    }));
+    host.appendChild(card({
+      title: 'Long run',
+      sub: 'The key session of each week — the Saturday long run, 10 miles building to 21, then the race itself.',
+      legend: legendOf([['Planned', GRAY, 'key-line'], ['Logged', BLUE, 'key-line'], ['Race', RED]]),
+      chart: longRunChart(plan, getLog, at)
+    }));
+    host.appendChild(card({
+      title: 'Cumulative miles',
+      sub: range === 'block'
+        ? 'Running total against the plan across all ' + plan.weeks.length + ' weeks.'
+        : 'Running total against the plan, zoomed to the weeks so far.',
+      legend: legendOf([['Planned', GRAY, 'key-line'], ['Logged', BLUE, 'key-line']]),
+      chart: cumulativeChart(plan, getLog, now, range),
+      control: rangeControl(plan, range, function () { window.renderCharts(plan, getLog, now); })
+    }));
+    window.centerChartsOnNow();
+  };
+
+  /* On a phone the charts scroll sideways. Bring the current week into view
+     instead of always opening on week 1. Needs layout, so it is a no-op while
+     the dashboard is hidden — plan.js calls it again on returning there. */
+  window.centerChartsOnNow = function () {
+    document.querySelectorAll('#charts .chart-scroll').forEach(function (box) {
+      var svg = box.querySelector('svg[data-now-x]');
+      if (!svg || box.scrollWidth <= box.clientWidth) return;
+      var x = (+svg.getAttribute('data-now-x') / W) * box.scrollWidth;
+      box.scrollLeft = Math.max(0, x - box.clientWidth / 2);
+    });
   };
 })();

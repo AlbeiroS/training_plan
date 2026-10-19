@@ -559,6 +559,7 @@
       var cur = document.querySelector('#weeks .week.is-now');
       if (cur) { cur.classList.add('open'); cur.scrollIntoView({ block: 'start' }); return; }
     }
+    if (v === 'dashboard' && window.centerChartsOnNow) window.centerChartsOnNow();
     window.scrollTo(0, 0);
   }
 

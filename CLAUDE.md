@@ -109,7 +109,8 @@ Hash-routed views, no framework: `#dashboard` (default) · `#weeks` · `#paces` 
 The hero only shows on the dashboard (`body:not(.v-dashboard) .hero`). The nav is
 sticky. `#weeks` scrolls to and opens the current week.
 
-The dashboard is: hero → block stats → a "this week" card you can log from → charts.
+The dashboard is: hero → block stats → charts → a "this week" card you can log from
+(the athlete asked for the card below the charts).
 "This week" is computed from `start`; before the block begins it shows week 1 as
 "up next".
 
@@ -156,10 +157,25 @@ source. This is obscure, not secure. The Sheet's revision history is the undo.
 
 `assets/charts.js`, hand-rolled inline SVG — no charting library, so the page works
 off disk and offline. Three charts, each planned-vs-logged on **one** miles axis:
-weekly volume (grouped columns), long run (the week's longest planned session vs what
-was logged for that same session), and cumulative. A shaded "NOW"/"NEXT" column marks
-the current week. The cumulative logged line stops at today; the long-run logged line
-breaks where a week wasn't logged, so a gap reads as a gap.
+weekly volume (grouped columns), long run (the week's longest planned session — the
+Saturday long run, or the race — vs what was logged for that same session; weekday
+runs deliberately do not count here), and cumulative. A shaded "NOW"/"NEXT" column
+marks the current week. The cumulative logged line stops at today; the long-run logged
+line breaks where a week wasn't logged, so a gap reads as a gap.
+
+Each card can carry a one-line summary (`stat`) under its subtitle — chart functions
+return `{ svg, stat }`. The long-run summary says plainly when no long run has been
+logged, because a blank chart there was mistaken for a bug.
+
+Cumulative has a **To date / Whole block** switch (default To date, remembered in
+`localStorage` under `<storageKey>:cumRange`). On the whole-block 0–1,000 axis the
+first weeks are a few pixels tall and read as a flat line on zero; To date shows weeks
+1 → now+2 (minimum 4) with its own scale. Both lines start from a zero origin so one
+logged week still draws a line, not a lone dot.
+
+On phones the charts scroll sideways; `centerChartsOnNow()` scrolls each one so the
+current week is in view. It needs layout, so `route()` re-runs it on returning to the
+dashboard.
 
 Planned is context and wears `#ADA799`; logged is the subject and wears `#1C6E9E`.
 That gray is 2.4:1 against white — under 3:1, which is only acceptable because every
