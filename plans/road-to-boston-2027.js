@@ -10,6 +10,7 @@ window.PLAN_DATA = {
   "races": [
     {
       "name": "Houston Marathon",
+      "short": "HOU",
       "date": "2027-01-17",
       "week": 12,
       "goal": "3:30:00",
@@ -18,8 +19,9 @@ window.PLAN_DATA = {
     },
     {
       "name": "Boston Marathon",
+      "short": "BOS",
       "date": "2027-04-19",
-      "week": 26,
+      "week": 25,
       "goal": "Set in February",
       "note": "The A race. Goal time gets fixed after Houston tells us what the engine is actually worth."
     }

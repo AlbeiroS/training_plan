@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Road to Boston · 25 Weeks · Two Marathons</title>
 <meta name="description" content="A 25-week marathon block from October 2026 to the Boston Marathon, with the Houston Marathon raced at week 12.">
+<meta name="theme-color" content="#12141C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Road to Boston">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/plan.css">
 </head>
@@ -14,39 +17,61 @@
   <div class="wrap" id="hero"></div>
 </header>
 
-<div class="wrap">
+<nav class="nav" aria-label="Sections">
+  <div class="nav-in">
+    <span class="nav-brand" id="navBrand"></span>
+    <a href="#dashboard" data-v="dashboard">Dashboard</a>
+    <a href="#weeks" data-v="weeks">Weeks</a>
+    <a href="#paces" data-v="paces">Paces</a>
+    <a href="#phases" data-v="phases">Phases</a>
+  </div>
+</nav>
 
-  <section>
-    <h2 class="sec">The block</h2>
-    <p class="sec-sub">Intermediate level of the 24-week framework, capped at 55 mi/week and 21 mi long.</p>
-    <div class="stats" id="stats"></div>
-  </section>
+<main class="wrap">
 
-  <section>
-    <h2 class="sec">Paces</h2>
-    <p class="sec-sub">Built off a 3:30 Houston target — 8:01/mi. Everything else derives from that.</p>
-    <div class="paces" id="paces"></div>
-  </section>
+  <div class="view" data-view="dashboard">
+    <section>
+      <h2 class="sec">The block</h2>
+      <p class="sec-sub">Intermediate level of the 24-week framework, capped at 55 mi/week and 21 mi long.</p>
+      <div class="stats" id="stats"></div>
+    </section>
 
-  <section>
-    <h2 class="sec">Phases</h2>
-    <p class="sec-sub">Your base → stride → cadence → taper framework, with Houston raced at the seam.</p>
-    <div class="phases" id="phases"></div>
-  </section>
+    <section>
+      <div id="thisWeek"></div>
+    </section>
 
-  <section>
-    <h2 class="sec">The shape of it</h2>
-    <p class="sec-sub">What is in front of you, at a glance. Every value is also in the week list below.</p>
-    <div id="charts"></div>
-  </section>
+    <section>
+      <h2 class="sec">The shape of it</h2>
+      <p class="sec-sub">Planned in gray, what you actually ran in blue. Every value is also in the week list.</p>
+      <div id="charts"></div>
+    </section>
+  </div>
 
-  <section>
-    <h2 class="sec">Week by week</h2>
-    <p class="sec-sub">Tap a week to open it. Tap <em>log</em> on a session once it is done — the current week opens automatically.</p>
-    <div class="weeks" id="weeks"></div>
-  </section>
+  <div class="view" data-view="weeks">
+    <section>
+      <h2 class="sec">Week by week</h2>
+      <p class="sec-sub">Tap a week to open it. Tap <em>Log</em> on a session to record what you actually ran.</p>
+      <div class="weeks" id="weeks"></div>
+    </section>
+  </div>
 
-</div>
+  <div class="view" data-view="paces">
+    <section>
+      <h2 class="sec">Paces</h2>
+      <p class="sec-sub">Built off a 3:30 Houston target — 8:01/mi. Everything else derives from that.</p>
+      <div class="paces" id="paces"></div>
+    </section>
+  </div>
+
+  <div class="view" data-view="phases">
+    <section>
+      <h2 class="sec">Phases</h2>
+      <p class="sec-sub">Your base → stride → cadence → taper framework, with Houston raced at the seam.</p>
+      <div class="phases" id="phases"></div>
+    </section>
+  </div>
+
+</main>
 
 <div class="bar">
   <div class="bar-in">
@@ -55,9 +80,9 @@
       <div class="track"><div class="fill" id="progF" style="width:0%"></div></div>
     </div>
     <span class="sync" id="syncDot"></span>
-    <button id="btnExport">Export</button>
-    <button id="btnImport">Import</button>
-    <button id="btnReset">Reset</button>
+    <button type="button" id="btnExport">Export</button>
+    <button type="button" id="btnImport">Import</button>
+    <button type="button" id="btnReset">Reset</button>
   </div>
 </div>
 

@@ -66,7 +66,7 @@ The file is `window.PLAN_DATA = { ... };` wrapping this object:
   "id": "...", "title": "...", "kicker": "...", "subtitle": "...",
   "start": "2026-10-26",        // Monday of week 1
   "storageKey": "rtb2027",      // must be unique per plan or logs collide
-  "races":  [ { "name", "date", "week", "goal", "note" } ],
+  "races":  [ { "name", "short", "date", "week", "goal", "note" } ],  // week = the plan week it falls in; short = chart label (HOU)
   "paces":  [ { "key", "label", "pace", "note" } ],   // key must match a --var in plan.css
   "phases": { "base": { "label", "color", "weeks", "objective", "focus" } },
   "weeks":  [ { "n", "phase", "title", "dates", "total", "note",
@@ -93,8 +93,18 @@ wired as the `training-plan` config.
 ## Publishing
 
 Commit and push to `main`; Pages redeploys in under a minute. Files are UTF-8 and
-contain `·`, `×`, `–`, `→` — keep them that way. Non-ASCII in the JSON is written as
-`\uXXXX` escapes deliberately, so the data file survives any editor.
+contain `·`, `×`, `–`, `→` — keep them that way.
+
+## Page structure
+
+Hash-routed views, no framework: `#dashboard` (default) · `#weeks` · `#paces` ·
+`#phases`. `route()` in `plan.js` toggles `.view.on` and a `v-<name>` class on `body`.
+The hero only shows on the dashboard (`body:not(.v-dashboard) .hero`). The nav is
+sticky. `#weeks` scrolls to and opens the current week.
+
+The dashboard is: hero → block stats → a "this week" card you can log from → charts.
+"This week" is computed from `start`; before the block begins it shows week 1 as
+"up next".
 
 ## Logging and sync
 
@@ -102,13 +112,27 @@ Two tiers, and the split is the point: **plans live in git, logs live in a Sheet
 Authored content wants version history; captured data wants to be queryable and to
 outlive any one device.
 
+A log entry records what was actually run, keyed `"<week>-<sessionIndex>"`:
+`{ mi, time, note, at }`. `time` is normalised to `h:mm:ss`/`m:ss`; pace is derived,
+never stored locally. The editor (bottom sheet on phones) accepts `:`, `.` or spaces as
+time separators so the phone's decimal keypad is enough. The original format stored
+`true` per key — `normalize()` upgrades those to the planned distance on load, and
+also drops entries for sessions that no longer exist.
+
 - `localStorage` under `storageKey` is always written first, so the UI never waits on
   the network and logging works with no signal. It does **not** survive clearing site
   data — the Export/Import JSON buttons are the manual backup path.
-- `assets/sync.js` + `apps-script/Code.gs` push the log to a Google Sheet. Toggles
-  queue in `<storageKey>:pending` and flush when they can; on load the Sheet is the
+- `assets/sync.js` + `apps-script/Code.gs` push the log to a Google Sheet. Changes
+  queue in `<storageKey>:pending` (each with a unique `stamp`, so an edit made while a
+  flush is in flight is not lost) and flush when they can; on load the Sheet is the
   source of truth with anything pending applied on top. The bottom bar shows
   `synced` / `syncing` / `offline` / `local only`.
+
+Sheet columns: `plan key week session day type planned_mi actual_mi time pace notes
+done updated_at`, one row per session, upserted by `(plan, key)`. Removing a log sets
+`done = FALSE` rather than deleting the row. **Columns B and I:K are forced to plain
+text** — otherwise Sheets turns a key like `3-1` into 1 March and `1:22:10` into a
+time-of-day, silently corrupting the log. Keep that if you touch `Code.gs`.
 
 Sync is **off** until `assets/sync-config.js` has a `/exec` URL and token — with it
 empty everything still works, just locally. Setup steps are in the header comment of
@@ -124,8 +148,18 @@ source. This is obscure, not secure. The Sheet's revision history is the undo.
 ## Charts
 
 `assets/charts.js`, hand-rolled inline SVG — no charting library, so the page works
-off disk and offline. Three charts: weekly volume (columns), long run (line), and
-cumulative planned-vs-logged.
+off disk and offline. Three charts, each planned-vs-logged on **one** miles axis:
+weekly volume (grouped columns), long run (the week's longest planned session vs what
+was logged for that same session), and cumulative. A shaded "NOW"/"NEXT" column marks
+the current week. The cumulative logged line stops at today; the long-run logged line
+breaks where a week wasn't logged, so a gap reads as a gap.
+
+Planned is context and wears `#ADA799`; logged is the subject and wears `#1C6E9E`.
+That gray is 2.4:1 against white — under 3:1, which is only acceptable because every
+planned value is also in the week list and the tooltips. Don't remove both of those.
+
+Legend swatch classes are `key-bar` / `key-line`, not `bar` / `line`: a bare `.bar`
+matches the fixed footer and pins the swatch to the bottom of the screen.
 
 Phase identity is carried by the labelled band under the x-axis, **never by bar hue**.
 The seven UI phase colours fail pairwise CVD separation as large fills (stride
