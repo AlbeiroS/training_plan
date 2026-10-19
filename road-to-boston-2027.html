@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Road to Boston · 25 Weeks · Two Marathons</title>
+<meta name="description" content="A 25-week marathon block from October 2026 to the Boston Marathon, with the Houston Marathon raced at week 12.">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/plan.css">
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap" id="hero"></div>
+</header>
+
+<div class="wrap">
+
+  <section>
+    <h2 class="sec">The block</h2>
+    <p class="sec-sub">Intermediate level of the 24-week framework, capped at 55 mi/week and 21 mi long.</p>
+    <div class="stats" id="stats"></div>
+  </section>
+
+  <section>
+    <h2 class="sec">Paces</h2>
+    <p class="sec-sub">Built off a 3:30 Houston target — 8:01/mi. Everything else derives from that.</p>
+    <div class="paces" id="paces"></div>
+  </section>
+
+  <section>
+    <h2 class="sec">Phases</h2>
+    <p class="sec-sub">Your base → stride → cadence → taper framework, with Houston raced at the seam.</p>
+    <div class="phases" id="phases"></div>
+  </section>
+
+  <section>
+    <h2 class="sec">Week by week</h2>
+    <p class="sec-sub">Tap a week to open it. Tap <em>log</em> on a session once it is done — the current week opens automatically.</p>
+    <div class="weeks" id="weeks"></div>
+  </section>
+
+</div>
+
+<div class="bar">
+  <div class="bar-in">
+    <div class="prog">
+      <div class="prog-t" id="progT">—</div>
+      <div class="track"><div class="fill" id="progF" style="width:0%"></div></div>
+    </div>
+    <button id="btnExport">Export</button>
+    <button id="btnImport">Import</button>
+    <button id="btnReset">Reset</button>
+  </div>
+</div>
+
+<script src="assets/plan.js"></script>
+<script>renderPlan('plans/road-to-boston-2027.json');</script>
+</body>
+</html>
