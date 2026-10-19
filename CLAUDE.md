@@ -142,9 +142,13 @@ done updated_at`, one row per session, upserted by `(plan, key)`. Removing a log
 text** — otherwise Sheets turns a key like `3-1` into 1 March and `1:22:10` into a
 time-of-day, silently corrupting the log. Keep that if you touch `Code.gs`.
 
-Sync is **off** until `assets/sync-config.js` has a `/exec` URL and token — with it
-empty everything still works, just locally. Setup steps are in the header comment of
-`apps-script/Code.gs`.
+Sync is **on** (since Oct 19, 2026): `assets/sync-config.js` points at the athlete's
+deployed Apps Script. Emptying `url` there turns it off and everything still works
+locally. The deployed script is a **copy** pasted into the Sheet's Apps Script editor —
+editing `apps-script/Code.gs` in this repo changes nothing live. A change to it must be
+pasted over there and deployed as a **new version** (Deploy → Manage deployments →
+edit → New version); the `/exec` URL stays the same. The athlete renamed the Sheet tab
+(`SHEET_NAME` differs from the repo copy's `'log'`) — check theirs before pasting over.
 
 The POST deliberately uses `Content-Type: text/plain` so the browser treats it as a
 simple request and sends no CORS preflight — Apps Script does not answer `OPTIONS`.
