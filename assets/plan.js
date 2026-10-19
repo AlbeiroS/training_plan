@@ -224,6 +224,11 @@
     });
   }
 
+  function drawCharts() {
+    if (!window.renderCharts) return;
+    renderCharts(PLAN, function (weekN, idx) { return !!logged[weekN + '-' + idx]; });
+  }
+
   /* Re-render the week list without collapsing whatever the user had open. */
   function redrawKeepingOpen() {
     var open = [];
@@ -235,7 +240,7 @@
       var node = document.querySelector('#weeks .week[data-week="' + n + '"]');
       if (node) node.classList.add('open');
     });
-    renderBar();
+    renderBar(); drawCharts();
   }
 
   function openCurrentWeek() {
@@ -299,7 +304,7 @@
     load();
     document.title = data.title + ' · ' + data.kicker;
     renderHero(); renderStats(); renderPaces(); renderPhases();
-    renderWeeks(); openCurrentWeek(); renderBar();
+    renderWeeks(); openCurrentWeek(); renderBar(); drawCharts();
 
     if (!storageWorks()) {
       document.querySelector('.wrap').appendChild(el('div', 'warn',
